@@ -14,12 +14,17 @@ namespace State_Machines.AniMUH
         // add other states below!
         //public OtherState OtherState = new OtherState();
 
+        [Header("Anim")]
+        public Transform sprite3D;
+        
         [Header("Movement")]
         public LayerMask Environment;
         [SerializeField] private CapsuleCollider mainCollider;
         [HideInInspector] public bool isGrounded;
         private float _sphereCastRadius = 0.5f;
         [HideInInspector] public Rigidbody rb;
+        [HideInInspector] public Vector3 pseudoForward;
+        [HideInInspector] public float pseudoForwardRotSpeed = 2f;
         
         public enum AniMuhID
         {
@@ -52,8 +57,7 @@ namespace State_Machines.AniMUH
                 }
             }
 
-            moveIn /= inCount;
-            
+            moveIn /= moveIn != Vector2.zero ? inCount : 1;
             return new Vector3(moveIn.x, 0, moveIn.y);
         }
 
@@ -68,32 +72,65 @@ namespace State_Machines.AniMUH
 
         void Awake()
         {
+            pseudoForward = transform.forward;
+            rb = GetComponent<Rigidbody>();
+            // rb.mass = curStats.weight;
+            
             currentState = IdleState;
             currentState.EnterState(this);
+            
+            SwitchAnimuh(AniMuhID.Penguing);
+            // curStats = Animuhs[AniMuhID.Penguing].Item2;
         }
 
         private void Start()
         {
-        
+            isGrounded = true;
+            if (Gamepad.all.Count == 0) Debug.Log("No controllers connected");
+            
         }
 
         void Update()
-        {
+        { 
             currentState.UpdateState(this);
             
             CalculateCapsuleBottom(mainCollider, out var bottom);
-            isGrounded = Physics.SphereCast(bottom + Vector3.up * (1.2f * _sphereCastRadius), 1, Vector3.down, out RaycastHit hit, 0.3f,
+            isGrounded = Physics.SphereCast(bottom + Vector3.up * 1.1f, 1, Vector3.down, out RaycastHit hit, 0.3f,
                 Environment);
+            
+            // Debug.Log(isGrounded + " bottom y = " + bottom.y);
+            
+            if (TotalMoveInput().magnitude > Utils.minimumInputValue)
+            {
+                pseudoForward = Vector3.RotateTowards(pseudoForward, TotalMoveInput(), Mathf.PI * pseudoForwardRotSpeed * Time.deltaTime, 0.0f);
+            }
         }
 
         private void LateUpdate()
         {
+            SpriteTransUpdate();
             currentState.AnimUpdateState(this);
+        }
+
+        private void SpriteTransUpdate()
+        {
+            sprite3D.position = transform.position;
+            sprite3D.forward = pseudoForward;
         }
 
         private void FixedUpdate()
         {
             currentState.FixedUpdateState(this);
+            ApplyConstantForces();
+        }
+        
+        private void ApplyConstantForces()
+        {
+            // gravity
+            if(!isGrounded) rb.AddForce(Vector3.down * (9.81f * rb.mass * curStats.gravScale), ForceMode.Force);
+        
+            // drag
+            rb.AddForce(new Vector3(-rb.velocity.x, 0f, -rb.velocity.z) * curStats.movementDragStrength);
         }
         
         void CalculateCapsuleBottom(CapsuleCollider collider, out Vector3 bottom)
@@ -102,7 +139,30 @@ namespace State_Machines.AniMUH
             float capsuleHeight = collider.height * transform.localScale.y;
 
             bottom = worldCenter - new Vector3(0, (capsuleHeight / 2), 0);
-            //Debug.Log(bottom);
+        }
+
+        public void SwitchAnimuh(AniMuhID aniMuhID)
+        {
+            // set sprite 3D active if it is what was passed in. If not, disable
+            // TODO maybe this is not instant, to allow for animation
+            foreach (AniMuhID id in AniMuhID.GetValues(typeof(AniMuhID)))
+            {
+                try
+                {
+                    Animuhs[id].Item1.SetActive(id == aniMuhID);
+                }
+                catch
+                {
+                    // if this message runs, fix it in the serialized dictionary on the game object
+                    // or remove the mentioned animuh from the enum list atop this script
+                    Debug.Log(id + " animuh is not assigned to dictionary! (not severe)");
+                }
+            }
+            
+            // set current animal stats to appropriate animal
+            curStats = Animuhs[aniMuhID].Item2;
+            
+            // TODO trigger any other visual indicator
         }
         
 

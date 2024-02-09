@@ -7,7 +7,7 @@ namespace State_Machines.AniMUH
 
         public override void EnterState(StateManager manager, float number, Vector3 vec, string str)
         {
-            //Debug.Log("entered state");
+            Debug.Log("entered idle state");
         }
 
         public override void UpdateState(StateManager manager)

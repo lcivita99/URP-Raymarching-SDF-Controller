@@ -15,9 +15,9 @@ MonoBehaviour:
   minMoveSpeed: 15
   maxMoveSpeed: 30
   movementDragStrength: 15
-  jumpForce: 0
-  jumpMinMoveSpeed: 0
-  jumpMaxMoveSpeed: 0
-  jumpDragStrength: 0
-  gravScale: 0
-  weight: 0
+  jumpForce: 4.57
+  jumpMinMoveSpeed: 14.6
+  jumpMaxMoveSpeed: 6.16
+  jumpDragStrength: 4.74
+  gravScale: 1.25
+  weight: 4.05
