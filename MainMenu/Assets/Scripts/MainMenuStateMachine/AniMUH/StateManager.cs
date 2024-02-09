@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using AYellowpaper.SerializedCollections;
 
 namespace State_Machines.AniMUH
 {
@@ -20,10 +21,19 @@ namespace State_Machines.AniMUH
         private float _sphereCastRadius = 0.5f;
         [HideInInspector] public Rigidbody rb;
         
-        // [Header("Stats")]
-        public List<AniMUHSO> animuhStats;
-        public AniMUHSO curStats;
-
+        public enum AniMuhID
+        {
+            Penguing = 0,
+            Beetle = 1,
+            Monkey = 2,
+            Horce = 3,
+            Deer = 4
+        }
+        
+        public SerializedDictionary<AniMuhID, SerializableTuple<GameObject, AniMUHSO>> Animuhs;
+        
+        [HideInInspector] public AniMUHSO curStats;
+        
         [Tooltip("minimum input to register character control")]
         [HideInInspector] public float minInput = 0.1f;
         public Vector3 TotalMoveInput()
