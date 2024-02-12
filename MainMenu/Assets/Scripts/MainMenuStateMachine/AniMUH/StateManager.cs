@@ -10,22 +10,24 @@ namespace State_Machines.AniMUH
         public BaseState currentState;
         public IdleState IdleState = new IdleState();
         public MoveState MoveState = new MoveState();
+
         public JumpState JumpState = new JumpState();
         // add other states below!
         //public OtherState OtherState = new OtherState();
 
-        [Header("Anim")]
-        public Transform sprite3D;
-        
-        [Header("Movement")]
-        public LayerMask Environment;
+        [Header("Anim")] public Transform sprite3D;
+        public Transform[] metaShapesTransforms;
+
+        [Header("Movement")] public LayerMask Environment;
         [SerializeField] private CapsuleCollider mainCollider;
         [HideInInspector] public bool isGrounded;
         private float _sphereCastRadius = 0.5f;
         [HideInInspector] public Rigidbody rb;
         [HideInInspector] public Vector3 pseudoForward;
         [HideInInspector] public float pseudoForwardRotSpeed = 2f;
-        
+
+        [Header("Materials")] public Material mat;
+
         public enum AniMuhID
         {
             Penguing = 0,
@@ -34,13 +36,14 @@ namespace State_Machines.AniMUH
             Horce = 3,
             Deer = 4
         }
-        
+
         public SerializedDictionary<AniMuhID, SerializableTuple<GameObject, AniMUHSO>> Animuhs;
-        
+
         [HideInInspector] public AniMUHSO curStats;
-        
-        [Tooltip("minimum input to register character control")]
-        [HideInInspector] public float minInput = 0.1f;
+
+        [Tooltip("minimum input to register character control")] [HideInInspector]
+        public float minInput = 0.1f;
+
         public Vector3 TotalMoveInput()
         {
             Vector2 moveIn = Vector2.zero;
@@ -48,7 +51,7 @@ namespace State_Machines.AniMUH
             foreach (var pad in Gamepad.all)
             {
                 Vector2 padIn = pad.leftStick.ReadValue();
-                
+
                 // only consider input if greater than min input
                 if (padIn.magnitude >= minInput)
                 {
@@ -67,6 +70,7 @@ namespace State_Machines.AniMUH
             {
                 if (pad.buttonSouth.wasPressedThisFrame) return true;
             }
+
             return false;
         }
 
@@ -75,34 +79,36 @@ namespace State_Machines.AniMUH
             pseudoForward = transform.forward;
             rb = GetComponent<Rigidbody>();
             // rb.mass = curStats.weight;
-            
+
             currentState = IdleState;
             currentState.EnterState(this);
-            
+
             SwitchAnimuh(AniMuhID.Penguing);
             // curStats = Animuhs[AniMuhID.Penguing].Item2;
         }
 
         private void Start()
         {
+            // rend = GetComponent<Renderer>();
             isGrounded = true;
             if (Gamepad.all.Count == 0) Debug.Log("No controllers connected");
-            
+
         }
 
         void Update()
-        { 
+        {
             currentState.UpdateState(this);
-            
+
             CalculateCapsuleBottom(mainCollider, out var bottom);
             isGrounded = Physics.SphereCast(bottom + Vector3.up * 1.1f, 1, Vector3.down, out RaycastHit hit, 0.3f,
                 Environment);
-            
+
             // Debug.Log(isGrounded + " bottom y = " + bottom.y);
-            
+
             if (TotalMoveInput().magnitude > Utils.minimumInputValue)
             {
-                pseudoForward = Vector3.RotateTowards(pseudoForward, TotalMoveInput(), Mathf.PI * pseudoForwardRotSpeed * Time.deltaTime, 0.0f);
+                pseudoForward = Vector3.RotateTowards(pseudoForward, TotalMoveInput(),
+                    Mathf.PI * pseudoForwardRotSpeed * Time.deltaTime, 0.0f);
             }
         }
 
@@ -110,6 +116,7 @@ namespace State_Machines.AniMUH
         {
             SpriteTransUpdate();
             currentState.AnimUpdateState(this);
+            SetUniforms();
         }
 
         private void SpriteTransUpdate()
@@ -123,16 +130,16 @@ namespace State_Machines.AniMUH
             currentState.FixedUpdateState(this);
             ApplyConstantForces();
         }
-        
+
         private void ApplyConstantForces()
         {
             // gravity
-            if(!isGrounded) rb.AddForce(Vector3.down * (9.81f * rb.mass * curStats.gravScale), ForceMode.Force);
-        
+            if (!isGrounded) rb.AddForce(Vector3.down * (9.81f * rb.mass * curStats.gravScale), ForceMode.Force);
+
             // drag
             rb.AddForce(new Vector3(-rb.velocity.x, 0f, -rb.velocity.z) * curStats.movementDragStrength);
         }
-        
+
         void CalculateCapsuleBottom(CapsuleCollider collider, out Vector3 bottom)
         {
             Vector3 worldCenter = transform.TransformPoint(mainCollider.center);
@@ -158,13 +165,13 @@ namespace State_Machines.AniMUH
                     Debug.Log(id + " animuh is not assigned to dictionary! (not severe)");
                 }
             }
-            
+
             // set current animal stats to appropriate animal
             curStats = Animuhs[aniMuhID].Item2;
-            
+
             // TODO trigger any other visual indicator
         }
-        
+
 
         public void SwitchState(BaseState state)
         {
@@ -188,6 +195,17 @@ namespace State_Machines.AniMUH
         {
             currentState = state;
             currentState.EnterState(this, number, vec, str);
+        }
+
+        // Shaders
+
+        public void SetUniforms()
+        {
+            for (int i = 0; i < metaShapesTransforms.Length; i++)
+            {
+                string posID = "_Pos" + (i + 1);
+                mat.SetVector(posID, metaShapesTransforms[i].localPosition);
+            }
         }
     }
 }
