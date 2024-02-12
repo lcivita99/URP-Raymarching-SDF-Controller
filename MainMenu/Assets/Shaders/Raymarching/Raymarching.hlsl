@@ -26,7 +26,7 @@
 #define MAX_STEPS 100
 #define MAX_DIST 100
 #define SURF_DIST 0.001
-#define BLENDINESS 0.2
+#define BLENDINESS 0.3
 // #define SHAPE_COUNT 10
 
 #pragma multi_compile _ _MAIN_LIGHT_SHADOWS

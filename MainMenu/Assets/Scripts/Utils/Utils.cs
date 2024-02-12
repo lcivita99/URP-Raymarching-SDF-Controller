@@ -12,6 +12,14 @@ public static class Utils
     {
         return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
     }
+    
+    public static float Smootherstep(this float value, float edge0, float edge1)
+    {
+        // Scale, and clamp x to 0..1 range
+        value = Mathf.Clamp01((value - edge0) / (edge1 - edge0));
+        // Evaluate polynomial
+        return value * value * value * (value * (value * 6 - 15) + 10);
+    }
 
 }
 

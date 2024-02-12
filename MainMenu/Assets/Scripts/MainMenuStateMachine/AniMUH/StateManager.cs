@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using AYellowpaper.SerializedCollections;
+using UnityEngine.Serialization;
 
 namespace State_Machines.AniMUH
 {
@@ -16,7 +19,10 @@ namespace State_Machines.AniMUH
         //public OtherState OtherState = new OtherState();
 
         [Header("Anim")] public Transform sprite3D;
-        public Transform[] metaShapesTransforms;
+        public SerializableTuple<Transform[], float>[] metaShapes;
+        [SerializeField] private Transform[] habitatRefs;
+        [HideInInspector] public List<List<Vector3>> originalPositions;
+        [HideInInspector] public float moveAnimTimer = 0;
 
         [Header("Movement")] public LayerMask Environment;
         [SerializeField] private CapsuleCollider mainCollider;
@@ -30,11 +36,11 @@ namespace State_Machines.AniMUH
 
         public enum AniMuhID
         {
-            Penguing = 0,
-            Beetle = 1,
-            Monkey = 2,
-            Horce = 3,
-            Deer = 4
+            Beetle = 0,
+            Horce = 1,
+            Deer = 2,
+            Monkey = 3
+            // Deer = 4
         }
 
         public SerializedDictionary<AniMuhID, SerializableTuple<GameObject, AniMUHSO>> Animuhs;
@@ -83,8 +89,26 @@ namespace State_Machines.AniMUH
             currentState = IdleState;
             currentState.EnterState(this);
 
-            SwitchAnimuh(AniMuhID.Penguing);
+            SwitchAnimuh(AniMuhID.Beetle);
+
+            SetOriginalPositions();
+
+            // transWeights = new []{}
             // curStats = Animuhs[AniMuhID.Penguing].Item2;
+        }
+
+        private void SetOriginalPositions()
+        {
+            originalPositions = new List<List<Vector3>>();
+
+            for (int i = 0; i < metaShapes.Length; i++)
+            {
+                originalPositions.Add(new List<Vector3>());
+                for (int j = 0; j < metaShapes[i].Item1.Length; j++)
+                {
+                    originalPositions[i].Add(metaShapes[i].Item1[j].localPosition);
+                }
+            }
         }
 
         private void Start()
@@ -201,11 +225,68 @@ namespace State_Machines.AniMUH
 
         public void SetUniforms()
         {
-            for (int i = 0; i < metaShapesTransforms.Length; i++)
+            CalculateWeights();
+            
+            List<Vector3> weightedPositions = new List<Vector3>();
+
+            for (int i = 0; i < metaShapes[0].Item1.Length; i++)
+            {
+                weightedPositions.Add(Vector3.zero);
+            }
+            
+            for (int i = 0; i < metaShapes.Length; i++)
+            {
+                for (int j = 0; j < metaShapes[i].Item1.Length; j++)
+                {
+                    weightedPositions[j] += metaShapes[i].Item1[j].localPosition * metaShapes[i].Item2;
+                }
+            }
+
+            for (int i = 0; i < metaShapes[0].Item1.Length; i++)
             {
                 string posID = "_Pos" + (i + 1);
-                mat.SetVector(posID, metaShapesTransforms[i].localPosition);
+                mat.SetVector(posID, weightedPositions[i]);
             }
         }
+        
+        // CalculateWeights() written with the assistance of ChatGPT, modified
+        private void CalculateWeights()
+        {
+            List<float> distances = new List<float>();
+
+            float smoothThreshold = 0.3f;
+            // Calculate distances to each reference vector
+            for (int i = 0; i < metaShapes.Length; i++)
+            {
+                float distance = Vector3.Distance(transform.position, habitatRefs[i].position);
+                distances.Add(distance);
+            }
+
+            // Find the minimum distance and identify references within the smoothing threshold
+            float minDistance = distances.Min();
+            List<float> closeDistances = distances.Where(d => d <= minDistance + smoothThreshold).ToList();
+
+            // Initial weights based on closeness
+            List<float> weights = distances.Select(d => closeDistances.Contains(d) ? (1f - (d - minDistance) / smoothThreshold) : 0f).ToList();
+
+            // Normalize weights to ensure they sum to 1
+            NormalizeWeights(weights);
+    
+            // Update weight array
+            for (int i = 0; i < metaShapes.Length; i++)
+            {
+                metaShapes[i].Item2 = weights[i];
+            }
+        }
+
+        private void NormalizeWeights(List<float> weights)
+        {
+            float sum = weights.Sum();
+            for (int i = 0; i < weights.Count; i++)
+            {
+                weights[i] /= sum;
+            }
+        }
+
     }
 }

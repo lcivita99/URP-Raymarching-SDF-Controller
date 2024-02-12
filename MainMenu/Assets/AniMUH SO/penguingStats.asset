@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minMoveSpeed: 15
   maxMoveSpeed: 30
-  movementDragStrength: 15
+  movementDragStrength: 7
   jumpForce: 4.57
   jumpMinMoveSpeed: 14.6
   jumpMaxMoveSpeed: 6.16

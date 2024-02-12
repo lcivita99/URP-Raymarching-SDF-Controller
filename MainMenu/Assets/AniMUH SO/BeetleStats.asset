@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53d7fcea61f3e4b498e6c4be46c0d6a3, type: 3}
   m_Name: BeetleStats
   m_EditorClassIdentifier: 
-  minMoveSpeed: 15
-  maxMoveSpeed: 30
-  movementDragStrength: 15
-  jumpForce: 0
-  jumpMinMoveSpeed: 0
-  jumpMaxMoveSpeed: 0
-  jumpDragStrength: 0
-  gravScale: 0
-  weight: 0
+  minMoveSpeed: 18.1
+  maxMoveSpeed: 35.5
+  movementDragStrength: 10.2
+  jumpForce: 7.32
+  jumpMinMoveSpeed: 13
+  jumpMaxMoveSpeed: 24.9
+  jumpDragStrength: 10.12
+  gravScale: 1.34
+  weight: 2.26
