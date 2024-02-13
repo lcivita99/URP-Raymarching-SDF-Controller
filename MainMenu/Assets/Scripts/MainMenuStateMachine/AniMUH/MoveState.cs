@@ -47,10 +47,10 @@ namespace State_Machines.AniMUH
             // chompers
             // left
             sdfTrans(manager, beetleID, 2).localPosition =
-                manager.originalPositions[(int) beetleID][2] + Mathf.Sin(Time.timeSinceLevelLoad * 5) * Vector3.right/20;
+                manager.originalPositions[(int) beetleID][2] + Mathf.Sin(Time.timeSinceLevelLoad * 7.5f) * Vector3.right/20;
             // right
             sdfTrans(manager, beetleID, 3).localPosition =
-                manager.originalPositions[(int) beetleID][3] + Mathf.Sin(Time.timeSinceLevelLoad * 5) * Vector3.left/20;
+                manager.originalPositions[(int) beetleID][3] + Mathf.Sin(Time.timeSinceLevelLoad * 7.5f) * Vector3.left/20;
             
             // legs
             // left
@@ -109,6 +109,19 @@ namespace State_Machines.AniMUH
                 manager.originalPositions[(int) horceID][4]
                 + Mathf.Sin(manager.moveAnimTimer * 20 + Mathf.PI) * Vector3.forward/60
                 + Mathf.Cos(manager.moveAnimTimer * 20 + Mathf.PI) * Vector3.up/40;
+            
+            // arms
+            // left
+            sdfTrans(manager, horceID, 3).localPosition =
+                manager.originalPositions[(int) horceID][3]
+                + Mathf.Sin(manager.moveAnimTimer * 20) * Vector3.forward/20
+                + Mathf.Cos(manager.moveAnimTimer * 20) * Vector3.up/20;
+            // right
+            sdfTrans(manager, horceID, 2).localPosition =
+                manager.originalPositions[(int) horceID][2]
+                + Mathf.Sin(manager.moveAnimTimer * 20 + Mathf.PI/2) * Vector3.forward/20
+                + Mathf.Cos(manager.moveAnimTimer * 20 + Mathf.PI/2) * Vector3.up/20;
+            
 
             // deer
 
@@ -140,6 +153,11 @@ namespace State_Machines.AniMUH
                 + Mathf.Sin(manager.moveAnimTimer * 17) * Vector3.forward/20
                 + Mathf.Clamp01(Mathf.Cos(manager.moveAnimTimer * 17)) * Vector3.up / 20;
             
+            // head
+            sdfTrans(manager, monkeyID, 7).localPosition =
+                manager.originalPositions[(int)monkeyID][7]
+                + Mathf.Sin(manager.moveAnimTimer * 8.5f + Mathf.PI / 4) * Vector3.up / 80;
+
         }
 
         private Transform sdfTrans(StateManager manager, StateManager.AniMuhID aniMuh, int limbID)

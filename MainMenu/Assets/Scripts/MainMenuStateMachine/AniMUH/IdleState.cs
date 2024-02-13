@@ -43,10 +43,10 @@ namespace State_Machines.AniMUH
             // chompers
             // left
             sdfTrans(manager, beetleID, 2).localPosition =
-                manager.originalPositions[(int) beetleID][2] + Mathf.Sin(Time.timeSinceLevelLoad * 5) * Vector3.right/20;
+                manager.originalPositions[(int) beetleID][2] + Mathf.Sin(Time.timeSinceLevelLoad * 7.5f) * Vector3.right/20;
             // right
             sdfTrans(manager, beetleID, 3).localPosition =
-                manager.originalPositions[(int) beetleID][3] + Mathf.Sin(Time.timeSinceLevelLoad * 5) * Vector3.left/20;
+                manager.originalPositions[(int) beetleID][3] + Mathf.Sin(Time.timeSinceLevelLoad * 7.5f) * Vector3.left/20;
             
             // legs
             // // left
