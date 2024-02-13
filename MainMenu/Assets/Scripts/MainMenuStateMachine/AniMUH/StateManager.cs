@@ -38,8 +38,8 @@ namespace State_Machines.AniMUH
         {
             Beetle = 0,
             Horce = 1,
-            Deer = 2,
-            Monkey = 3
+            // Deer = 2,
+            Monkey = 2
             // Deer = 4
         }
 
