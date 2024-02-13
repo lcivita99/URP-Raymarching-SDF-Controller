@@ -254,7 +254,7 @@ namespace State_Machines.AniMUH
         {
             List<float> distances = new List<float>();
 
-            float smoothThreshold = 0.3f;
+            float smoothThreshold = 0.7f;
             // Calculate distances to each reference vector
             for (int i = 0; i < metaShapes.Length; i++)
             {

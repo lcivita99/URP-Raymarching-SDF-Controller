@@ -72,7 +72,43 @@ namespace State_Machines.AniMUH
             
 
             // horce
-
+            StateManager.AniMuhID horceID = StateManager.AniMuhID.Horce;
+            
+            // legs
+            // left
+            sdfTrans(manager, horceID, 0).localPosition =
+                manager.originalPositions[(int) horceID][0]
+                + Mathf.Sin(manager.moveAnimTimer * 20) * Vector3.forward/20
+                + Mathf.Cos(manager.moveAnimTimer * 20) * Vector3.up/20;
+            // right
+            sdfTrans(manager, horceID, 1).localPosition =
+                manager.originalPositions[(int) horceID][1]
+                + Mathf.Sin(manager.moveAnimTimer * 20 + Mathf.PI/2) * Vector3.forward/20
+                + Mathf.Cos(manager.moveAnimTimer * 20 + Mathf.PI/2) * Vector3.up/20;
+            
+            // hips
+            sdfTrans(manager, horceID, 6).localPosition =
+                manager.originalPositions[(int) horceID][6]
+                + Mathf.Sin(manager.moveAnimTimer * 20 + Mathf.PI/4) * Vector3.forward/35
+                + Mathf.Cos(manager.moveAnimTimer * 20 + Mathf.PI/4) * Vector3.up/20;
+            
+            // head
+            sdfTrans(manager, horceID, 7).localPosition =
+                manager.originalPositions[(int) horceID][7]
+                + Mathf.Sin(manager.moveAnimTimer * 20 + Mathf.PI/4) * Vector3.forward/60
+                + Mathf.Cos(manager.moveAnimTimer * 20 + Mathf.PI/4) * Vector3.up/40;
+            
+            // torso
+            sdfTrans(manager, horceID, 5).localPosition =
+                manager.originalPositions[(int) horceID][5]
+                + Mathf.Sin(manager.moveAnimTimer * 20 + Mathf.PI) * Vector3.forward/60
+                + Mathf.Cos(manager.moveAnimTimer * 20 + Mathf.PI) * Vector3.up/40;
+            
+            // neck
+            sdfTrans(manager, horceID, 4).localPosition =
+                manager.originalPositions[(int) horceID][4]
+                + Mathf.Sin(manager.moveAnimTimer * 20 + Mathf.PI) * Vector3.forward/60
+                + Mathf.Cos(manager.moveAnimTimer * 20 + Mathf.PI) * Vector3.up/40;
 
             // deer
 
